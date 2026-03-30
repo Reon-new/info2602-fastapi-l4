@@ -1,6 +1,7 @@
 from pwdlib import PasswordHash
-from app.models import *
+from app.models import User
 from app.database import get_session
+from sqlmodel import Session
 from sqlmodel import select
 from datetime import timedelta, datetime, timezone
 from app.database import SessionDep
@@ -35,7 +36,7 @@ def create_access_token(data: dict, expires_delta: timedelta = timedelta(minutes
     return encoded_jwt
 
 # Gets the current user who is making the request
-async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db:SessionDep)->User:
+def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db:Annotated[Session, Depends(get_session)])->User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
